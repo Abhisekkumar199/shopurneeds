@@ -1,0 +1,1139 @@
+<?php
+class DB_Functions {
+    private $db;
+    //put your code here
+    // constructor
+    function __construct() {
+        require_once 'DB_Connect.php';
+        // connecting to database
+        $this->db = new DB_Connect();
+
+        $this->db->connect();
+
+    }
+
+
+
+    // destructor
+
+    function __destruct() {
+
+         
+
+    }
+
+
+
+    /**
+
+     * Storing new user
+
+     * returns user details
+
+     */
+
+    public function storeUser($fullName,$email,$password,$mobile,$landlineno,$companyname,$street,$state,$city,$pin,$userType,$userLogo) {       
+
+
+		$result = mysql_query("INSERT INTO jewellersmandi_user_registration(fname, emailid, password,billing_mobile, billing_phone, companyname, billing_housenumber, billing_state, billing_city, billing_zip, usertype, adddate,displayflag) VALUES('".$fullName."', '".$email."', '".$password."', '".$mobile."', '".$landlineno."', '".$companyname."', '".$street."', '".$state."', '".$city."', '".$pin."', '".$userType."', NOW(),'1')");
+
+        // check for successful store
+
+        if ($result) {
+
+$inserid=mysql_insert_id();
+
+if($userLogo!='') { 
+define('UPLOAD_PATH', '../userlogo/');
+$imagename = time().$_FILES['userLogo']['name'];
+move_uploaded_file($_FILES['userLogo']['tmp_name'], UPLOAD_PATH . $imagename);
+$update = mysql_query("UPDATE jewellersmandi_user_registration set logo='".$imagename."'  WHERE id = \"$inserid\"");
+}
+/*if($userDocument!='') { 
+define('UPLOAD_PATH1', '../userdocument/');
+$imagename1 = time().$_FILES['userDocument']['name'];
+move_uploaded_file($_FILES['userDocument']['tmp_name'], UPLOAD_PATH1 . $imagename1);
+$update = mysql_query("UPDATE jewellersmandi_user_registration set document='".$imagename1."'  WHERE id = \"$inserid\"");
+}
+
+if($userVisitingCard!='') { 
+define('UPLOAD_PATH2', '../visitingcardimages/');
+$imagename2 = time().$_FILES['userVisitingCard']['name'];
+move_uploaded_file($_FILES['userVisitingCard']['tmp_name'], UPLOAD_PATH2 . $imagename2);
+$update = mysql_query("UPDATE jewellersmandi_user_registration set visiting_card='".$imagename2."'  WHERE id = \"$inserid\"");
+}*/
+            $result12 = mysql_query("SELECT * FROM jewellersmandi_user_registration WHERE id = \"$inserid\"");
+
+			            $result122 = mysql_fetch_array($result12);
+				
+			            return $result122;
+
+        } else {
+
+            return false;
+
+        }
+
+    }
+
+	
+public function editProfileUserById($userId,$fname,$lname,$mobile,$landlineno,$companyname,$street,$state,$city,$pin,$userType,$userLogo,$userDocument,$category,$gstNo,$panNo,$aadhaarNo) { 
+     
+$ex = explode(',',$category);
+for($i=0;$i<count($ex);$i++) {
+$categorySql = mysql_fetch_assoc(mysql_query("select cat_id from jewellersmandi_category where categoryname='".trim($ex[$i])."' limit 1"));
+$catid .=$categorySql['cat_id'].','; 
+}
+$cat22 = substr($catid,0,-1); 
+
+		$result = mysql_query("UPDATE jewellersmandi_user_registration set `fname`='".$fname."', `lname`='".$lname."',`billing_mobile`='".$mobile."', `billing_phone`='".$landlineno."', `companyname`='".$companyname."', `billing_housenumber`='".$street."', `billing_state`='".$state."', `billing_city`='".$city."', `billing_zip`='".$pin."', `usertype`='".$userType."', `category`='".$cat22."',`gstno`='".$gstNo."',`panno`='".$panNo."',`aadhaarno`='".$aadhaarNo."' where id='".$userId."'");
+
+        // check for successful store
+
+        if ($result) {
+
+if($userLogo!='') { 
+define('UPLOAD_PATH', '../userlogo/');
+$imagename = time().$_FILES['userLogo']['name'];
+if(move_uploaded_file($_FILES['userLogo']['tmp_name'], UPLOAD_PATH . $imagename)){
+$update = mysql_query("UPDATE jewellersmandi_user_registration set logo='".$imagename."'  WHERE id = \"$userId\"");
+}
+}
+if($userDocument!='') { 
+define('UPLOAD_PATH1', '../userdocument/');
+$imagename1 = time().$_FILES['userDocument']['name'];
+if(move_uploaded_file($_FILES['userDocument']['tmp_name'], UPLOAD_PATH1 . $imagename1)){
+$update = mysql_query("UPDATE jewellersmandi_user_registration set document='".$imagename1."'  WHERE id = \"$userId\"");
+}
+}
+
+if($userVisitingCard!='') { 
+define('UPLOAD_PATH2', '../visitingcardimages/');
+$imagename2 = time().$_FILES['userVisitingCard']['name'];
+if(move_uploaded_file($_FILES['userVisitingCard']['tmp_name'], UPLOAD_PATH2 . $imagename2)) {
+$update = mysql_query("UPDATE jewellersmandi_user_registration set visiting_card='".$imagename2."'  WHERE id = \"$userId\"");
+}
+}
+				
+			            return true;
+
+        } else {
+
+            return false;
+
+        }
+
+    }
+	
+
+	public function validateUserBymobile($mobile) {       
+
+        $result = mysql_query("SELECT * FROM buyde_user_registration WHERE billing_mobile = '$mobile'") or die(mysql_error());
+
+        // check for result 
+
+        $no_of_rows = mysql_num_rows($result);
+
+        if ($no_of_rows > 0) {
+
+            $result = mysql_fetch_array($result);
+
+			$oror=rand(100,999);
+
+$oror1=rand(100,999);
+
+$otpcds=$oror1.$oror;
+
+			        $resultsdf = mysql_query("update buyde_user_registration set fpassotp='$otpcds' WHERE id = '".$result['id']."'") or die(mysql_error());
+
+ $str= $result['fname']." Welcome to the Mallfort.com. Your OTP is ".$otpcds;
+
+$message=urlencode($str);
+
+$username="mallfort";
+
+$password="39256";
+
+$senderid="MLLFRT";
+
+$numbers=$mobile;
+
+$url="http://smsleads.in/pushsms.php?username=$username&password=$password&message=$message&sender=$senderid&numbers=$numbers"; $ch = curl_init($url); curl_setopt($ch, CURLOPT_HEADER, 0); curl_setopt($ch, CURLOPT_POST, 0); curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); curl_setopt($ch, CURLOPT_FOLLOWLOCATION, TRUE); $responsess = curl_exec($ch); 
+
+			        $result12 = mysql_query("SELECT * FROM buyde_user_registration WHERE id = '".$result['id']."'") or die(mysql_error());
+
+            $result12 = mysql_fetch_array($result12);
+
+
+
+                return $result12;
+
+        } else {
+
+            // user not found
+
+            return false;
+
+        }
+
+    }
+
+	public function validateRegBymobile($mobile) {       
+
+        $result = mysql_query("update  buyde_user_registration set displayflag='1',approveflag='1' WHERE billing_mobile = '$mobile'") or die(mysql_error());
+
+       
+
+			        $result12 = mysql_query("SELECT * FROM buyde_user_registration WHERE billing_mobile = '".$mobile."'") or die(mysql_error());
+
+ $no_of_rows = mysql_num_rows($result12);
+
+        if ($no_of_rows > 0) {
+
+                return mysql_fetch_array($result12);
+
+        } else {
+
+            // user not found
+
+            return false;
+
+        }
+
+    }
+
+
+
+/*	public function getTopCategory($catids) {       
+    $categorySql = mysql_query("SELECT `cat_id`,`categoryname`,`uploadimage` FROM `buyde_category` WHERE `displayflag` = '1'") or die(mysql_error());
+    $no_of_rows = mysql_num_rows($categorySql);
+        if ($no_of_rows > 0) {
+           return mysql_fetch_array($categorySql);
+        } else {
+            // user not found
+            return false;
+        }
+    }
+*/		
+
+	
+
+	public function changeUserpassword($userId,$oldPassword,$newPassword) {       
+
+			        $result12 = mysql_query("SELECT * FROM jewellersmandi_user_registration WHERE password = '".$oldPassword."' and id='".$userId."'") or die(mysql_error());
+
+ $no_of_rows = mysql_num_rows($result12);
+
+        if ($no_of_rows > 0) {
+				$update = mysql_query("UPDATE jewellersmandi_user_registration set password='".$newPassword."' where id='".$userId."'");
+                return true;
+
+        } else {
+
+            // user not found
+
+            return false;
+
+        }
+
+    }
+
+    /**
+
+     * Get user by email and password
+
+     */
+
+    public function getUserByEmailAndPassword($email, $password) {
+        $result = mysql_query("SELECT * FROM jewellersmandi_user_registration WHERE emailid = '".$email."'  and password='".$password."'") or die(mysql_error());
+
+        // check for result 
+
+        $no_of_rows = mysql_num_rows($result);
+
+        if ($no_of_rows > 0) {
+		
+		$chsql = mysql_query("SELECT * FROM jewellersmandi_user_registration WHERE emailid = '".$email."'");
+		
+
+           $result = mysql_fetch_array($chsql); 
+return $result;
+
+
+        } else { 
+            // user not found
+			return false;
+        }
+
+    }
+
+
+
+    /**
+
+     * Check user is existed or not
+
+     */
+
+    public function isUserExisted($email) {
+        $result = mysql_query("SELECT emailid from jewellersmandi_user_registration WHERE emailid = '$email'");
+        $no_of_rows = mysql_num_rows($result);
+        if ($no_of_rows > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
+
+    /**
+
+     * Encrypting password
+
+     * @param password
+
+     * returns salt and encrypted password
+
+     */
+
+    public function hashSSHA($password) {
+
+
+
+        $salt = sha1(rand());
+
+        $salt = substr($salt, 0, 10);
+
+        $encrypted = base64_encode(sha1($password . $salt, true) . $salt);
+
+        $hash = array("salt" => $salt, "encrypted" => $encrypted);
+
+        return $hash;
+
+    }
+
+
+
+    /**
+
+     * Decrypting password
+
+     * @param salt, password
+
+     * returns hash string
+
+     */
+
+    public function checkhashSSHA($salt, $password) {
+
+
+
+        $hash = base64_encode(sha1($password . $salt, true) . $salt);
+
+
+
+        return $hash;
+
+    }
+
+	
+
+	public function getProductByCatidAndBrand($catid,$brand,$ksearch,$page,$price) {
+
+	$catid1 = (!empty($catid)) ? " and cat_id='".$catid."'" : "";
+
+	$brand1 = (!empty($brand)) ? " and bid='".$brand."'" : "";
+
+	$ksearch1 = (!empty($ksearch)) ? " and MATCH(productname) AGAINST ('".$ksearch."' IN BOOLEAN MODE)" : "";
+
+	$sellingprice = (!empty($sellingprice)) ? " and sellingprice between '".$price."' " : "";
+
+	$lk = $page;
+
+	$ed = $lk*20;
+
+	$st = $ed-20;
+
+	if($page!='') { 
+
+		$limit = " limit $st,20";
+
+	}
+	$result = mysql_query("select * from buyde_product where displayflag='1' {$ksearch1} {$catid1} {$brand1}{$sellingprice} {$limit}");
+
+		$no_of_rows = mysql_num_rows($result);
+
+        if ($no_of_rows > 0) {
+
+				return $result;
+
+        } else {
+
+            // user not existed
+
+            return false;
+
+        }
+
+	}
+
+	public function getProductDetailsForview($pid) {
+
+	$result = mysql_query("select * from buyde_product where displayflag='1' and id='".$pid."'");
+
+		$no_of_rows = mysql_num_rows($result);
+
+        if ($no_of_rows > 0) {
+
+				return mysql_fetch_array($result);
+
+        } else {
+
+            // user not existed
+
+            return false;
+
+        }
+
+	}
+
+	public function getProductDetailsForviewByCategory($catid) {
+
+	$result = mysql_query("select * from buyde_product where displayflag='1' and cat_id='".$catid."'");
+
+		$no_of_rows = mysql_num_rows($result);
+
+        if ($no_of_rows > 0) {
+
+				return mysql_fetch_array($result);
+
+        } else {
+
+            // user not existed
+
+            return false;
+
+        }
+
+	}
+	
+
+	public function getProductCartDetails($pid) {
+
+	$result = mysql_query("select * from buyde_product where displayflag='1' and id='".$pid."'");
+
+	$no_of_rows = mysql_num_rows($result);
+
+        if ($no_of_rows > 0) {
+
+				return mysql_fetch_array($result);
+
+        } else {
+
+            // user not existed
+
+            return false;
+
+        }
+
+	}
+	
+	
+	#-----------------------------------------------------------------------------Add To Cart
+	
+	public function addToCart($pid) {	
+	$result = mysql_query("select * from buyde_master_product where displayflag='1' and id='".$pid."'");
+	
+	$no_of_rows = mysql_num_rows($result);
+        if ($no_of_rows > 0) {
+
+				return mysql_fetch_array($result);
+
+        } else {
+
+            // user not existed
+
+            return false;
+
+        }
+
+	}
+	public function getEnquiryByUsersId($userId) {
+	
+		$result = mysql_query("SELECT * FROM jewellersmandi_product_enquiry where displayflag='1' and user_id='".$userId."' ORDER BY id DESC");
+	
+	$no_of_rows = mysql_num_rows($result);
+        if ($no_of_rows > 0) {
+
+				return $result;
+
+        } else {
+
+            // user not existed
+
+            return false;
+
+        }
+	}
+	
+	public function getSingleEnquiryByUsersId($userId,$eId) {
+	
+		$result = mysql_query("SELECT * FROM jewellersmandi_product_enquiry where displayflag='1' and user_id='".$userId."' and id='".$eId."' ORDER BY id DESC");
+	
+	$no_of_rows = mysql_num_rows($result);
+        if ($no_of_rows > 0) {
+
+				return $result;
+
+        } else {
+
+            // user not existed
+
+            return false;
+
+        }
+	}
+	
+	public function getEnquiryByUsersCurrent($userId,$tabName) {
+	
+		$result = mysql_query("SELECT * FROM jewellersmandi_product_enquiry where displayflag='1'  ORDER BY id DESC");
+	
+	$no_of_rows = mysql_num_rows($result);
+        if ($no_of_rows > 0) {
+
+				return $result;
+
+        } else {
+
+            // user not existed
+
+            return false;
+
+        }
+	}
+	
+	public function getEnquiryByUsersold($userId,$tabName) {
+	
+		$result = mysql_query("SELECT * FROM jewellersmandi_product_enquiry where displayflag='1' and user_id!='".$userId."' ORDER BY id DESC");
+	
+	$no_of_rows = mysql_num_rows($result);
+        if ($no_of_rows > 0) {
+
+				return $result;
+
+        } else {
+
+            // user not existed
+
+            return false;
+
+        }
+	}
+	
+	public function userDetailsEnquiryById($clientId) {	
+	$result = mysql_query("select * from jewellersmandi_user_registration where id='".$clientId."'");
+	
+	$no_of_rows = mysql_num_rows($result);
+        if ($no_of_rows > 0) {
+
+				return mysql_fetch_array($result);
+
+        } else {
+
+            // user not existed
+
+            return false;
+
+        }
+
+	}
+	
+	
+	
+	public function junkEnquiryByUserId($userId,$enquiryId) {       
+
+		$result = mysql_query("insert into jewellersmandi_junkproduct (`user_id`,`peid`,`adddate`) values ('".$userId."', '".$enquiryId."', NOW())");
+
+        // check for successful store 
+
+        if ($result) {
+
+			    return true;
+
+        } else {
+
+            return false;
+
+        }
+
+    }
+	
+	public function contactEnquiryByUserId($userId,$enquiryId) {       
+
+		$result = mysql_query("insert into jewellersmandi_contactproduct (`user_id`,`peid`,`adddate`) values ('".$userId."', '".$enquiryId."', NOW())");
+        if ($result) {
+			return true;
+        } else {
+            return false;
+        }
+    }
+	
+	
+	public function notificationEnquiryByUserId($userid) {	
+	
+	$result = mysql_query("select * from jewellersmandi_product_enquiry where displayflag='1' order by id desc");
+	
+	$no_of_rows = mysql_num_rows($result);
+        if ($no_of_rows > 0) {
+				return $result;
+        } else {
+            // user not existed
+            return false;
+        }
+
+	}
+	
+	public function actionAllListing($userid) {	
+	$result = mysql_query("select * from jewellersmandi_auction where displayflag='1' order by id desc");
+	
+	$no_of_rows = mysql_num_rows($result);
+        if ($no_of_rows > 0) {
+
+				return $result;
+
+        } else {
+
+            // user not existed
+
+            return false;
+
+        }
+
+	}
+	
+	 public function sellOnAuctionUserById($userId,$title,$price,$description,$sponsored,$image) {       
+
+		$result = mysql_query("INSERT INTO jewellersmandi_auction(user_id, title, price,description,  sponsored, adddate) VALUES('".$userId."', '".$title."', '".$price."', '".mysql_real_escape_string($description)."', '".$sponsored."', NOW())");
+
+        // check for successful store 
+
+        if ($result) {
+		$inserid=mysql_insert_id();
+
+			define('UPLOAD_PATH', '../auctionimages/');
+			$imagename = time().$_FILES['image']['name'];
+			move_uploaded_file($_FILES['image']['tmp_name'], UPLOAD_PATH . $imagename);
+			$update = mysql_query("UPDATE jewellersmandi_auction set uploadimage='".$imagename."'  WHERE id = \"$inserid\"");
+
+			            return true;
+
+        } else {
+
+            return false;
+
+        }
+
+    }
+	
+	public function sellOnAuctionResponseUserById($userId) {
+	
+	$result = mysql_query("select * from jewellersmandi_auction_contact where displayflag='1' and auction_userid='".$userId."' and user_id order by auction_id desc");
+		if ($result) {
+			            return $result;
+
+        } else {
+
+            return false;
+
+        }
+	}
+	
+	public function businessContactResponseUserById($userId) {
+	
+	$result = mysql_query("select * from jewellersmandi_business_contact where displayflag='1' and business_user_id='".$userId."' and user_id order by business_id desc");
+		if ($result) {
+			            return $result;
+
+        } else {
+
+            return false;
+
+        }
+	}
+	
+	public function contactAuctionResponseUserById($userId,$clientId,$auctionId) {
+	$result = mysql_query("INSERT INTO jewellersmandi_auction_contact (`user_id`,`auction_id`,`auction_userid`,`adddate`) values ('".$userId."','".$auctionId."','".$clientId."',NOW())");
+		if ($result) {
+			   return true;
+
+        } else {
+
+            return false;
+
+        }
+	}
+	
+	public function contactFindPeopleResponseUserById($userId,$clientId,$businessId) { 
+		$result = mysql_query("INSERT INTO jewellersmandi_business_contact (`user_id`,`business_id`,`business_user_id`,`adddate`) values ('".$userId."','".$businessId."','".$clientId."',NOW())");
+		if ($result) {
+			   return true;
+
+        } else {
+
+            return false;
+
+        }
+	}
+	
+	
+	public function diamondContactResponseUserById($userId) {
+	
+	$result = mysql_query("select * from jewellersmandi_stock_upload_contact where displayflag='1' and stock_user_id='".$userId."' and uploadType='Diamond List' and user_id order by stock_id desc");
+		if ($result) {
+			            return $result;
+
+        } else {
+
+            return false;
+
+        }
+	}
+	
+	public function gemstoneContactResponseUserById($userId) {
+	
+	$result = mysql_query("select * from jewellersmandi_stock_upload_contact where displayflag='1' and stock_user_id='".$userId."' and uploadType='Gemstone List' and user_id order by stock_id desc");
+		if ($result) {
+			            return $result;
+
+        } else {
+
+            return false;
+
+        }
+	}
+	
+	public function jewelleryContactResponseUserById($userId) {
+	
+	$result = mysql_query("select * from jewellersmandi_stock_upload_contact where displayflag='1' and stock_user_id='".$userId."' and uploadType='Jewellery List' and user_id order by stock_id desc");
+		if ($result) {
+			return $result;
+        } else {
+            return false;
+
+        }
+	}
+	
+	
+	public function contactStockResponseUserById($userId,$clientId,$stockId,$stockType) {
+	 
+		$result = mysql_query("INSERT INTO jewellersmandi_stock_upload_contact	 (`user_id`,`stock_id`,`stock_user_id`,`uploadType`,`adddate`) values ('".$userId."','".$stockId."','".$clientId."','".$stockType."',NOW())");
+		if ($result) {
+			   return true;
+
+        } else {
+
+            return false;
+
+        }
+	}
+	 
+	
+	public function addBusinessListingByUserId($userId,$businessCategory,$businessSubCategory,$businessName,$contactPerson,$contactNumber,$contactEmail,$contactAddress,$description,$businessLogo,$businessVisitingCard,$state,$city) {
+	
+	$explode = explode(',',$businessSubCategory);
+	
+	for($i=0;$i<count($explode);$i++) { 
+
+		$subCategorySQL = mysql_query("select * from jewellersmandi_listing_subcategory where list_catid='".$businessCategory."' and listing_subcat_name='".trim($explode[$i])."'");
+		while($subCategoryRows = mysql_fetch_assoc($subCategorySQL)) { 
+	 $subcategryid[]= $subCategoryRows['id'];
+	}
+	}
+
+	
+	$subcategryid2 = implode(',',$subcategryid); 
+	
+		$result = mysql_query("INSERT INTO jewellersmandi_business_listing (`user_id`,`businesstype`, `businesstype_subcategory`,`business_name`,`contact_person`,`contact_number`,`contact_email`,`contact_address`,`business_category`,`description`,`state_id`,`city`,`adddate`) VALUES ('".$userId."','".$businessCategory."', '".$subcategryid2."', '".$businessName."','".$contactPerson."','".$contactNumber."','".$contactEmail."','".$contactAddress."','".$businessCategory."','".$description."','".$state."','".$city."',NOW())");
+
+        // check for successful store
+$lastId = mysql_insert_id();
+        if ($result) {
+
+if($businessLogo!='') { 
+define('UPLOAD_PATH', '../userlogo/');
+$imagename = time().$businessLogo;
+move_uploaded_file($_FILES['businessLogo']['tmp_name'], UPLOAD_PATH . $imagename);
+$update = mysql_query("UPDATE jewellersmandi_business_listing set logo='".$imagename."'  WHERE id = \"$lastId\"");
+}
+
+
+if($businessVisitingCard!='') { 
+define('UPLOAD_PATH2', '../visitingcardimages/');
+$imagename2 = time().$businessVisitingCard;
+move_uploaded_file($_FILES['businessVisitingCard']['tmp_name'], UPLOAD_PATH2 . $imagename2);
+$update = mysql_query("UPDATE jewellersmandi_business_listing set visiting_card='".$imagename2."'  WHERE id = \"$lastId\"");
+}
+				
+			            return true;
+
+        } else {
+
+            return false;
+
+        }
+	}
+	
+	public function labWorkshowListingById($userId,$city,$category,$subCategory) {
+	if($city!='') { 
+		$city2 = " and city='".$city."'";
+	} 
+	if($category) { 
+		$category2 = " and businesstype='".$category."'";
+	}
+	
+	
+	
+	$subcategory22 = mysql_fetch_assoc(mysql_query("select id from  jewellersmandi_listing_subcategory where listing_subcat_name='".$subCategory."' and list_catid='".$category."'"));
+	$subcategory2 = $subcategory22['id'];
+	if($subcategory22['id']!='') { 
+	$subcategory23 = $subcategory22['id'];
+	} else { 
+	$subcategory23 = '0';
+	}  
+	
+	if($subCategory) {
+		$subCategory2 = " and businesstype_subcategory like '%$subcategory23%'";
+	}
+		$result = mysql_query("SELECT * FROM jewellersmandi_business_listing WHERE displayflag='1'{$city2}{$category2}{$subCategory2}");
+		$num = mysql_num_rows($result);
+		if ($num>0) {
+			return $result;
+		} else { 
+			return false;
+		}
+	}
+	
+	public function manufacterListingById($userId,$city,$category,$subCategory) {
+	if($city!='') { 
+		$city2 = " AND city='".$city."'";
+	} 
+	if($category!='') { 
+		$category2 = " AND businesstype='".$category."'";
+	}
+	
+	
+	
+	$subcategory22 = mysql_fetch_assoc(mysql_query("select id from  jewellersmandi_listing_subcategory where listing_subcat_name='".$subCategory."' and list_catid='".$category."'"));
+	$subcategory2 = $subcategory22['id'];
+	if($subcategory22['id']!='') { 
+	$subcategory2 = $subcategory22['id'];
+	} else { 
+	$subcategory2 = '0';
+	}  
+	if($subCategory!='') {
+		$subCategory2 = " AND businesstype_subcategory like '%$subcategory2%'";
+	}
+		$result = mysql_query("SELECT * FROM jewellersmandi_business_listing WHERE displayflag='1' AND businesstype='3' {$city2}{$category2}{$subCategory2}");
+		$num = mysql_num_rows($result);
+		if ($num>0) {
+			return $result;
+		} else { 
+			return false;
+		}
+	}
+	
+	public function uploadStockListingById($userId,$shape2,$cutGrade,$polish,$symmetry,$color,$lab,$purity,$city,$fluorescence) {
+	if($shape2!='') {
+		$shape1 = " and shape='".$shape2."'";
+	}
+	if($cutGrade!='') {
+		$cutGrade1 = " and cutgrade='".$cutGrade."'";
+	}
+	if($polish!='') {
+		$polish1 = " and polish='".$polish."'";
+	}
+	if($symmetry!='') {
+		$symmetry1 = " and symmetry='".$symmetry."'";
+	}
+	if($color!='') {
+		$color1 = " and color='".$color."'";
+	}
+	if($lab!='') {
+		$lab1 = " and lab='".$lab."'";
+	}
+	if($purity!='') {
+		$purity1 = " and purity='".$purity."'";
+	}
+	if($city!='') {
+		$city1 = " and city='".$city."'";
+	}
+	if($fluorescence!='') {
+		$fluorescence1 = " and fluorescence='".$fluorescence."'";
+	}
+	
+		$result = mysql_query("SELECT * FROM jewellersmandi_upload_stock WHERE displayflag='1' {$shape1}{$cutGrade1}{$polish1}{$symmetry1}{$color1}{$lab}{$purity1}{$city1}{$fluorescence1} order by id desc");
+		if ($result) {
+			return $result;
+		} else { 
+			return false;
+		}
+	}
+	
+	public function uploadGemstoneListingById($userId,$gemstoneStone,$certificate,$stoneIdentity,$gemstoneShape,$pricePerCarat,$gemstoneWeight,$totalValue) {
+	if($gemstoneStone!='') {
+		$stone = " and stone='".$gemstoneStone."'";
+	}
+	if($certificate!='') {
+		$certificate1 = " and certificate='".$certificate."'";
+	}
+	if($stoneIdentity!='') {
+		$stoneIdentity1 = " and stone_identity='".$stoneIdentity."'";
+	}
+	if($gemstoneShape!='') {
+		$gemstoneShape1 = " and shape='".$gemstoneShape."'";
+	}
+	if($pricePerCarat!='') {
+		$pricePerCarat1 = " and price_per_carat='".$pricePerCarat."'";
+	}
+	if($gemstoneWeight!='') {
+		$gemstoneWeight1 = " and weight='".$gemstoneWeight."'";
+	}
+	if($totalValue!='') {
+		$totalValue1 = " and total_value='".$totalValue."'";
+	}
+	
+
+		$result = mysql_query("SELECT * FROM jewellersmandi_gemstoneupload WHERE displayflag='1' {$stone}{$certificate1}{$stoneIdentity1}{$gemstoneShape1}{$pricePerCarat1}{$gemstoneWeight1}{$totalValue1} order by id desc");
+		
+		if ($result) {
+			return $result;
+		} else { 
+			return false;
+		}
+	}
+	
+	
+	public function uploadJewelleryListingById($userId,$jewCertificate,$diamondColor,$diamondPurity,$metal,$face,$ear,$neck,$chest,$wrist,$finger,$diamondRate) {
+	
+	if($jewCertificate!='') {
+		$jewCertificate1 = " and certificate='".$jewCertificate."'";
+	}
+	if($diamondColor!='') {
+		$diamondColor1 = " and diamond_color='".$diamondColor."'";
+	}
+	if($diamondPurity!='') {
+		$diamondPurity1 = " and color='".$diamondPurity."'";
+	}
+	if($metal!='') {
+		$metal1 = " and metal='".$metal."'";
+	}
+	if($face!='') {
+		$face1 = " and face='".$face."'";
+	}
+	if($ear!='') {
+		$ear1 = " and ear='".$ear."'";
+	}
+	if($neck!='') {
+		$neck1 = " and neck='".$neck."'";
+	}
+	if($chest!='') {
+		$chest1 = " and chest='".$chest."'";
+	}
+	if($wrist!='') {
+		$wrist1 = " and wrist='".$wrist."'";
+	}
+	if($finger!='') {
+		$finger1 = " and finger='".$finger."'";
+	}
+	if($diamondRate!='') {
+		$diamondRate1 = " and diamond_rate='".$diamondRate."'";
+	}
+	
+
+		$result = mysql_query("SELECT * FROM jewellersmandi_jewelleryupload WHERE displayflag='1' {$jewCertificate1}{$diamondColor1}{$diamondPurity1}{$metal1}{$face1}{$ear1}{$neck1}{$chest1}{$wrist1}{$finger1}{$diamondRate1} order by id desc");
+		
+		if ($result) {
+			return $result;
+		} else { 
+			return false;
+		}
+	}
+	
+	
+	public function singleUploadStockDetailsById($userId,$stockId) {
+		$result = mysql_query("SELECT * FROM jewellersmandi_upload_stock WHERE displayflag='1' and id='".$stockId."'");
+		if ($result) {
+			return mysql_fetch_array($result);
+		} else { 
+			return false;
+		}
+	}
+	
+	public function singleGemstoneUploadStockDetailsById($userId,$gemstoneStockId) {
+	
+		$result = mysql_query("SELECT * FROM jewellersmandi_gemstoneupload WHERE displayflag='1' and id='".$gemstoneStockId."'");
+		if ($result) {
+			return mysql_fetch_array($result);
+		} else { 
+			return false;
+		}
+	}
+	
+	public function singleJewelleryUploadStockDetailsById($userId,$jewelleryStockId) {
+	
+		$result = mysql_query("SELECT * FROM jewellersmandi_jewelleryupload WHERE displayflag='1' and id='".$jewelleryStockId."'");
+		if ($result) {
+			return mysql_fetch_array($result);
+		} else { 
+			return false;
+		}
+	}
+	
+	public function paymentListingById($userId) {
+		$result = mysql_query("SELECT * FROM jewellersmandi_package WHERE displayflag='1'");
+		if ($result) {
+			return $result;
+		} else { 
+			return false;
+		}
+	}
+	
+	public function userProfileDetailsById($userId) { 
+		$result = mysql_query("SELECT * FROM jewellersmandi_user_registration WHERE id='".$userId."'");
+		if ($result) {
+			return mysql_fetch_array($result);
+		} else { 
+			return false;
+		}
+	}
+	
+	public function userEditProfileDetailsById($userId) { 
+		$result = mysql_query("SELECT * FROM jewellersmandi_user_registration WHERE id='".$userId."'");
+		if ($result) {
+			return mysql_fetch_array($result);
+		} else { 
+			return false;
+		}
+	}
+	
+	public function updateVistingCardById($userId,$visitingCard) {
+		if($visitingCard!='') { 
+define('UPLOAD_PATH', '../visitingcardimages/');
+$imagename = time().$visitingCard;
+move_uploaded_file($_FILES['visitingCard']['tmp_name'], UPLOAD_PATH . $imagename);
+$update = mysql_query("UPDATE jewellersmandi_user_registration set visiting_card='".$imagename."'  WHERE id = \"$userId\"");
+return true;
+		} else {
+
+            return false;
+
+        }
+	}
+	
+	public function uploadStockByUserId($userId,$stockNo,$shape,$sizeStock,$color,$purity,$lab,$certNo,$fluoRescence,$measurement,$cutGrade,$polish,$symmetry,$price,$discount,$td,$ta,$city,$comment,$uploadStockCheckbox,$dWeight,$certificateLink) {
+
+	$result = mysql_query("INSERT INTO jewellersmandi_upload_stock (`user_id`,`stockno`,`shape`,`size_stock`,`color`,`purity`,`lab`,`cert_no`,`fluorescence`,`measurement`,`cutgrade`,`polish`,`symmetry`,`price`,`discount`,`td`,`ta`,`city`,`comment`,`is_syndicate`,`cert_link`,`dweight`,`adddate`) values ('".$userId."','".$stockNo."','".$shape."','".$sizeStock."','".$color."','".$purity."','".$lab."','".$certNo."','".$fluoRescence."','".$measurement."','".$cutGrade."','".$polish."','".$symmetry."','".$price."','".$discount."','".$td."','".$ta."','".$city."','".mysql_real_escape_string($comment)."','".$uploadStockCheckbox."','".$certificateLink."','".$dWeight."',NOW())") or die (mysql_error());
+		if ($result) {
+			return true;
+		} else { 
+			return false;
+		}
+	}
+	
+	
+	public function uploadStockGemstoneByUserId($userId,$stone,$certificate,$stoneIdentity,$shape,$pricePerCarat,$weight,$totalValue,$uploadImage) {
+
+	$result = mysql_query("INSERT INTO jewellersmandi_gemstoneupload (`user_id`,`stone`,`certificate`,`stone_identity`,`shape`,`price_per_carat`,`weight`,`total_value`,`adddate`) values ('".$userId."','".$stone."','".$certificate."','".$stoneIdentity."','".$shape."','".$pricePerCarat."','".$weight."','".$totalValue."',NOW())") or die (mysql_error());
+	$id = mysql_insert_id();
+	if($uploadImage!='') { 
+define('UPLOAD_PATH', '../gemstoneimages/');
+$imagename = time().'_'.$uploadImage;
+move_uploaded_file($_FILES['uploadImage']['tmp_name'], UPLOAD_PATH . $imagename);
+$update = mysql_query("UPDATE jewellersmandi_gemstoneupload set uploadimage='".$imagename."'  WHERE id = \"$id\"");
+return true;
+		}
+	
+		if ($result) {
+			return true;
+		} else { 
+			return false;
+		}
+	}
+	
+	
+	public function uploadStockJewelleryByUserId($userId,$certificate,$diamondColor,$diamondClarity,$metal,$face,$totalValue,$grossWeight,$ear,$neck,$chest,$wrist,$finger,$diamondRate,$uploadImage) {
+
+	$result = mysql_query("INSERT INTO jewellersmandi_jewelleryupload (`user_id`,`certificate`,`diamond_color`,`color`,`metal`,`face`,`total_value`,`gross_weight`,`ear`,`neck`,`chest`,`wrist`,`finger`,`diamond_rate`,`adddate`) values ('".$userId."','".$certificate."','".$diamondColor."','".$diamondClarity."','".$metal."','".$face."','".$totalValue."','".$grossWeight."','".$ear."','".$neck."','".$chest."','".$wrist."','".$finger."','".$diamondRate."',NOW())") or die (mysql_error());
+	$id = mysql_insert_id();
+	if($uploadImage!='') { 
+define('UPLOAD_PATH', '../gemstoneimages/');
+$imagename = time().'_'.$uploadImage;
+move_uploaded_file($_FILES['uploadImage']['tmp_name'], UPLOAD_PATH . $imagename);
+$update = mysql_query("UPDATE jewellersmandi_jewelleryupload set uploadimage='".$imagename."'  WHERE id = \"$id\"");
+return true;
+		}
+	
+		if ($result) {
+			return true;
+		} else { 
+			return false;
+		}
+	}
+	
+	public function getUserDetailsById($userId) { 
+		$result = mysql_query("SELECT * FROM jewellersmandi_user_registration WHERE id='".$userId."'");
+		if ($result) {
+			return mysql_fetch_array($result);
+		} else { 
+			return false;
+		}
+	}
+	
+	public function deleteEnquiryById($enquiryId) {
+		$del = mysql_query("DELETE FROM jewellersmandi_product_enquiry WHERE id='".$enquiryId."'");
+		$del2 = mysql_query("DELETE FROM jewellersmandi_enquiry_attribute WHERE peid='".$enquiryId."'"); 
+		if ($del) {
+			return true;
+		} else { 
+			return false;
+		}
+	}
+	
+	public function getFavouriteEnquiryList($userId) {
+	
+		$result = mysql_query("SELECT * FROM jewellersmandi_favorite_product where  user_id='".$userId."' ORDER BY id DESC");
+	
+	$no_of_rows = mysql_num_rows($result);
+        if ($no_of_rows > 0) {
+
+				return $result;
+
+        } else {
+
+            // user not existed
+
+            return false;
+
+        }
+	}
+	
+	public function resetPassword($oldPassword,$newPassword,$emailId) {
+		$select  = mysql_query("select id from jewellersmandi_user_registration where `emailid`='".$emailId."' and `commcode`='".$oldPassword."' and `commcode`!=''");
+		if(mysql_num_rows($select)>0) {
+			$update = mysql_query("update jewellersmandi_user_registration set password='".$newPassword."' where emailid='".$emailId."'");
+			return true;
+		} else {
+			return false; 
+		}
+	}
+	#--------------------------------------------------------------------------Closed---------------------
+	
+	
+
+}
+
+
+
+?>
+

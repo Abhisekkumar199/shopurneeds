@@ -1,0 +1,99 @@
+<?php
+	require_once 'include/DB_Functions.php';
+	$db = new DB_Functions();
+	 $banner = $_REQUEST['homepage'];
+	 					$cartid = $_REQUEST['cartid'];
+
+if($banner=="homepage") {
+
+   $result12 = mysql_query("SELECT * FROM jewellersmandi_banners where bposition='Mobile Index Top' and displayflag='1' ORDER BY sortid ASC  Limit 5") or die(mysql_error());
+
+ $no_of_rows = mysql_num_rows($result12);
+        $response["status"] = "200";
+		$response["msg"] = "Success"; 
+		
+     	while($rowsa=mysql_fetch_array($result12)){
+
+			      $sss[] =array("imageurl"=>"https://www.jewellersmandi.com//bannerimages/".$rowsa['uploadimage'],"externalLink"=>$rowsa['externallink'],"title"=>$rowsa['bannername']); 
+     	}
+                $response["topbanners"]=$sss;
+                
+ $result12right = mysql_query("SELECT * FROM jewellersmandi_banners where bposition='Join Jewellersmandi' and displayflag='1' ORDER BY sortid ASC  Limit 10") or die(mysql_error());
+
+ $no_of_rows1 = mysql_num_rows($result12right);
+        $response["status"] = "200";
+		$response["msg"] = "Success"; 
+		
+     	while($rowsa=mysql_fetch_array($result12right)){
+
+			      $sssright[] =array("imageurl"=>"https://www.jewellersmandi.com/bannerimages/".$rowsa['uploadimage'],"externalLink"=>$rowsa['externallink'],"description"=>$rowsa['description']); 
+     	}
+                $response["joinjewellersBanners"]=$sssright; 
+				               
+     $result12left = mysql_query("SELECT * FROM jewellersmandi_banners where bposition='Home Square' and displayflag='1' ORDER BY sortid ASC  Limit 4") or die(mysql_error());
+
+ $no_of_rows2 = mysql_num_rows($result12right);
+        $response["status"] = "200";
+		$response["msg"] = "Success"; 
+		
+     	while($rowsa=mysql_fetch_array($result12left)){
+
+			      $sssleft[] =array("imageurl"=>"https://www.jewellersmandi.com/bannerimages/".$rowsa['uploadimage'],"externalLink"=>$rowsa['externallink']); 
+     	}
+                $response["Homesquare"]=$sssleft; 
+                
+                
+         $result12below = mysql_query("SELECT * FROM jewellersmandi_banners where bposition='Our Partner' and displayflag='1' ORDER BY sortid ASC  Limit 20") or die(mysql_error());
+
+ $no_of_rows3 = mysql_num_rows($result12below);
+        $response["status"] = "200";
+		$response["msg"] = "Success"; 
+		
+     	while($rowsa=mysql_fetch_array($result12below)){
+
+			      $sssbelow[] =array("imageurl"=>"https://www.jewellersmandi.com/bannerimages/".$rowsa['uploadimage'],"externalLink"=>$rowsa['externallink']); 
+     	}
+                $response["Ourpartner"]=$sssbelow;
+                
+				
+				$testimonialSql = mysql_query("SELECT * FROM jewellersmandi_testimonial where displayflag='1'") or die(mysql_error());
+    $tno_of_rows = mysql_num_rows($testimonialSql);
+        
+     		while($testimonialRows = mysql_fetch_array($testimonialSql)){
+				  $TestimonialResult[] = array("id"=>$testimonialRows['id'],"title"=>$testimonialRows['Title'],"clientname"=>$testimonialRows['ClientName'],"description"=>$testimonialRows['Description'],"imageurl"=>'https://www.jewellersmandi.com/clientlogo/'.$testimonialRows['uploadimage']);
+     		}
+                 $response["testimonial"]=$TestimonialResult;
+				
+			
+ $categorySql = mysql_query("SELECT `cat_id`,`categoryname`,`uploadimage` FROM `jewellersmandi_category` WHERE `displayflag` = '1' and parent='0' ORDER BY sortid ASC") or die(mysql_error());
+    $no_of_rows = mysql_num_rows($categorySql);
+        
+     		while($catRows = mysql_fetch_array($categorySql)){
+				  $catResult[] = array("catid"=>$catRows['cat_id'],"categoryname"=>$catRows['categoryname'],"categorydesc"=>$catRows['description'],"imageurl"=>'https://www.jewellersmandi.com/categoryimages/'.$catRows['uploadimage1']);
+     		}
+                 $response["topcategory"]=$catResult;
+				 
+                 
+    $result122 = mysql_query("SELECT title,uploadimage FROM jewellersmandi_auction where displayflag='1'  Limit 20") or die(mysql_error());
+    while($rowsas=mysql_fetch_array($result122)){
+    $sssss[] =array("imageurl"=>"https://www.jewellersmandi.com/bannerimages/".$rowsas['uploadimage'],"title"=>$rowsas['title']); 
+   	}
+					$response["auctionDetails"]=$sssss;
+	
+	echo json_encode($response);
+    
+  
+}
+
+else
+
+{
+    	$response["status"] = "400";
+				$response["msg"] = "Faliure";
+				echo json_encode($response);
+}
+
+		
+		
+
+?>

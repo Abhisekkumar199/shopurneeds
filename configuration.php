@@ -1,0 +1,38 @@
+<?php 
+include_once('includes/classes/config.inc.php');
+include_once('includes/classes/product.inc.php');
+include_once('includes/classes/cart.inc.php'); 
+include_once('includes/classes/paging.inc.php');
+include_once('includes/classes/query.inc.php'); 
+include_once('function_inc.php'); 
+define('URL','https://localhost/project/shopurneeds');
+define('FSite', 'https://localhost/project/shopurneeds');
+define('SSite', 'https://localhost/project/shopurneeds');
+define('TSite', 'https://localhost/project/shopurneeds');
+define('CompnaySite', 'https://localhost/project/shopurneeds');
+define('CompanyEmail', 'info@shopurneeds.in');
+define('AddressCity', 'Noida');
+define('Country', 'India');
+define('CompanyName', 'shopurneeds');
+define('CompanyAddress', 'NA');
+define('CompanyPhone1', '+91 0000000000');
+define('CompanyFax', '+91 0000000000');
+define('PostCode', '+91 0000000000');
+define('SiteTitle',   'shopurneeds');
+define('_FooterTitle_',   'shopurneeds');
+define('_SITE_NAME',    'https://localhost/project/shopurneeds');
+define('_ControlPanelSiteTitle_',   'shopurneeds:Control Panel');
+define('_ControlPanelPageHeading_',  'Control Panel');
+define('_ADMIN_TITLE_',   'shopurneeds');
+define('_PANEL_NAME',   'shopurneeds Control Panel');
+define('_PANEL_FOOTER',   'Powered By : Webkype Info Services Pvt. Ltd.');
+define('_SITE_NAME',    'shopurneeds');
+define('_SITE_ADDRESS', 'https://localhost/project/shopurneeds');
+define('_ADMIN_EMAIL',  'no-reply@https://localhost/project/shopurneeds');
+define('_SUPPORT_EMAIL', 'Support <info@shopurneeds.in>');
+define('IMGURL','https://localhost/project/shopurneeds/');
+$url="https://localhost/project/shopurneeds";
+//$cdnurl="https://shopurneeds009.b-cdn.net";
+$cdnurl="https://localhost/project/shopurneeds";
+$sufix="shopurneeds_";
+?>

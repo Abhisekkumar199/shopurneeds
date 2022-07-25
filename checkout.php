@@ -1,0 +1,64 @@
+<?php 
+ini_set('display_errors', 0);
+session_start(); 
+date_default_timezone_set('Asia/Calcutta'); 
+include("includes/configuration.php"); 
+include("includes/libraries/mailfunction.php");
+
+$CompanyEmail=CompanyEmail;  
+$CompanyName=CompanyName; 
+$URL=URL;
+	 
+if($_REQUEST['name']=='order')
+{
+    include("includes/header-cart.php");
+    include("pages/checkout.inc.php");
+}
+if($_REQUEST['name']=='codconfirm')
+{
+    include("includes/header-cart.php"); 
+    include("pages/codconfirm.inc.php"); 
+}
+if($_REQUEST['name']=='whishlist')
+{
+    include("includes/header-cart.php"); 
+    include("pages/whishlist.inc.php"); 
+}
+
+if($_REQUEST['name']=='payment')
+{
+    include("includes/header-cart.php"); 
+    include("pages/payment.inc.php"); 
+}
+
+if($_REQUEST['name']=='response')
+{
+    include("includes/header-cart.php"); 
+    include("pages/response.inc.php"); 
+}
+if($_REQUEST['name']=='success')
+{
+    include("includes/header-cart.php"); 
+    include("pages/success.inc.php"); 
+}
+if($_REQUEST['name']=='fail')
+{
+    include("includes/header-cart.php"); 
+    include("pages/failure.inc.php"); 
+}
+if($_REQUEST['name']=='confirm')
+{
+    include("includes/header-cart.php"); 
+    include("pages/orderconfirm.inc.php"); 
+}
+if($_REQUEST['name']=='cancel')
+{
+    include("includes/header-cart.php"); 
+    include("pages/cancel.inc.php"); 
+}
+if($_REQUEST['name']=='ptresponse')
+{
+    include("includes/header_success.php"); 
+    include("pages/ptresponse.inc.php"); 
+} 
+?>

@@ -1,0 +1,64 @@
+<?php
+	require_once 'include/DB_Functions.php';
+	$db = new DB_Functions();
+	 $banner = $_REQUEST['homepage'];
+	 					$cartid = $_REQUEST['cartid'];
+
+if($banner=="homepage") {
+
+   $result12 = mysql_query("SELECT * FROM jewellersmandi_banners where bposition='Mobile Index Top' and displayflag='1' ORDER BY sortid ASC  Limit 5") or die(mysql_error());
+
+ $no_of_rows = mysql_num_rows($result12);
+        $response["status"] = "200";
+		$response["msg"] = "Success"; 
+		
+     	while($rowsa=mysql_fetch_array($result12)){
+			if($rowsa['uploadimage']!='') { 
+			$imageurl = "https://www.jewellersmandi.com//bannerimages/".$rowsa['uploadimage'];
+			} else { 
+			$imageurl = "";
+			}
+			      $sss[] =array("imageurl"=>$imageurl,"externalLink"=>$rowsa['externallink'],"title"=>$rowsa['bannername']); 
+     	}
+                $response["topbanners"]=$sss;
+				
+							
+ $categorySql = mysql_query("SELECT `cat_id`,`categoryname`,`uploadimage1` FROM `jewellersmandi_category` WHERE `displayflag` = '1' and parent='0' ORDER BY sortid ASC") or die(mysql_error());
+    $no_of_rows = mysql_num_rows($categorySql);
+        
+     		while($catRows = mysql_fetch_array($categorySql)){
+			
+			if($catRows['uploadimage1']!='') { 
+			$imageurl = 'https://www.jewellersmandi.com/categoryimages/'.$catRows['uploadimage1'];
+			} else { 
+			$imageurl = "";
+			}
+				  $catResult[] = array("catid"=>$catRows['cat_id'],"categoryname"=>$catRows['categoryname'],"imageurl"=>$imageurl);
+     		} 
+                 $response["createEnquiry"]=$catResult;
+             
+				$testimonialSql = mysql_query("SELECT * FROM jewellersmandi_testimonial where displayflag='1'") or die(mysql_error());
+    $tno_of_rows = mysql_num_rows($testimonialSql);
+        
+     		while($testimonialRows = mysql_fetch_array($testimonialSql)){
+			if($testimonialRows['uploadimage']!='') { 
+				$imageurl = 'https://www.jewellersmandi.com/clientlogo/'.$testimonialRows['uploadimage'];
+			} else { 
+				$imageurl = "";
+			}
+				  $TestimonialResult[] = array("id"=>$testimonialRows['id'],"title"=>$testimonialRows['Title'],"clientname"=>$testimonialRows['ClientName'],"description"=>strip_tags($testimonialRows['Description']),"imageurl"=>$imageurl);
+     		}
+                 $response["testimonial"]=$TestimonialResult;
+	echo json_encode($response); 
+}
+else
+{
+    	$response["status"] = "400";
+				$response["msg"] = "Faliure";
+				echo json_encode($response);
+}
+
+		
+		
+
+?>

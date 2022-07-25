@@ -1,0 +1,117 @@
+<?php
+header('Content-Type: text/html; charset=utf-8'); 
+session_start(); 
+include("include/configurationadmin.php");  
+
+$id=$_REQUEST['id'];
+$option=$_REQUEST['option'];
+
+$bannername=$_REQUEST['bannername']; 
+$bannername_in_hebrew=$_REQUEST['bannername_in_hebrew']; 
+$externallink=$_REQUEST['externallink']; 
+$description= $_REQUEST['description'];  
+$description_in_hebrew=mysqli_real_escape_string($conn,$_REQUEST['description_in_hebrew']); 
+$bposition=$_REQUEST['bposition']; 
+$status = $_REQUEST['status'];  
+  
+define ("MAX_SIZE","3000");  
+ $errors=0;
+$image=$_FILES['image']['name']; 
+
+ mysqli_query($conn,"SET NAMES 'utf8'"); 
+mysqli_query($conn,'SET CHARACTER SET utf8');
+if($option=="Edit")
+{	
+	// uploading banner
+	if($image) 
+ 	{ 
+ 		$filename = $_FILES['image']['name'];  		
+		$extension = getExtension($filename);		
+ 		$extension = strtolower($extension); 	
+ 		if (($extension != "jpg") && ($extension != "jpeg") && ($extension != "png") && ($extension != "gif")) 
+ 		{ 
+		    $_SESSION['message']="<div class='alert alert-danger' role='alert'>Invalid File Extension!</div>";
+		    ?>
+			    <script>window.location.href='https://localhost/project/shopurneeds/admin-panel/add-banner.php?id=<?php echo $id; ?>&option=Edit';</script>
+		    <?php 
+ 		} 
+ 		else
+ 		{
+		    $size=filesize($_FILES['image']['tmp_name']); 
+			if ($size > MAX_SIZE*5024)
+			{ 
+			    $_SESSION['message']="<div class='alert alert-danger' role='alert'>You have exceeded the size limit</div>";
+		    ?>
+			    <script>window.location.href='https://localhost/project/shopurneeds/admin-panel/add-banner.php?id=<?php echo $id; ?>&option=Edit';</script>
+		    <?php 
+			}
+	
+			$image_name=$id."_".$filename;		
+			$newname="../uploads/bannerimages/".$image_name;		
+			$move=move_uploaded_file($_FILES['image']['tmp_name'],$newname); 
+		} 	
+	}
+	 
+	 
+	if($image!="")
+	{
+	    $fieldname=$image_name;
+	}
+	else
+	{
+	    $fieldname=$_REQUEST['blankimage'];
+	}	
+	 
+	
+    mysqli_query($conn,"update `".$sufix."banners` set `bannername`='".$bannername."',`bannername_in_hebrew`='".$bannername_in_hebrew."',`externallink`='".$externallink."',`description`='".$description."',`description_in_hebrew`='".$description_in_hebrew."', `uploadimage`='".$fieldname."',`bposition`='".$bposition."',`add_user`='".$_SESSION['username']."', `displayflag`='".$status."', `editdate`='".date("Y-m-d")."'   where id='".$id."'") ;
+    
+     
+}
+else
+{  
+    mysqli_query($conn,"insert into `".$sufix."banners` set `bannername`='".$bannername."',`bannername_in_hebrew`='".$bannername_in_hebrew."',`externallink`='".$externallink."',`description`='".$description."',`description_in_hebrew`='".$description_in_hebrew."', `uploadimage`='".$fieldname."',`bposition`='".$bposition."',`add_user`='".$_SESSION['username']."', `displayflag`='".$status."', `adddate`='".date("Y-m-d")."'") ; 
+    $id=mysqli_insert_id($conn);
+     
+	
+	// uploading banner 
+	if($image) 
+ 	{ 
+ 		$filename = $_FILES['image']['name'];  		
+		$extension = getExtension($filename);		
+ 		$extension = strtolower($extension); 	
+ 		if (($extension != "jpg") && ($extension != "jpeg") && ($extension != "png") && ($extension != "gif")) 
+ 		{ 
+		    $_SESSION['message']="<div class='alert alert-danger' role='alert'>Invalid File Extension!</div>";
+		    ?>
+			    <script>window.location.href='https://localhost/project/shopurneeds/admin-panel/add-banner.php?id=<?php echo $id; ?>&option=Edit';</script>
+		    <?php 
+ 		} 
+ 		else
+ 		{
+		    $size=filesize($_FILES['image']['tmp_name']); 
+			if ($size > MAX_SIZE*5024)
+			{ 
+			    $_SESSION['message']="<div class='alert alert-danger' role='alert'>You have exceeded the size limit</div>";
+		    ?>
+			    <script>window.location.href='https://localhost/project/shopurneeds/admin-panel/add-banner.php?id=<?php echo $id; ?>&option=Edit';</script>
+		    <?php 
+			}
+			$image_name=$id."_".$filename;		
+			$newname="../uploads/bannerimages/".$image_name;		
+			$move=move_uploaded_file($_FILES['image']['tmp_name'],$newname); 
+			mysqli_query($conn,"update `".$sufix."banners` set `uploadimage`='".$image_name."' where id='".$id."'") ;	 
+		} 	
+	}
+	
+	 
+} 
+if($option=="Edit")
+{ 
+    $_SESSION['message']="<div class='alert alert-success' role='alert'>Banner has been updated</div>";
+    ?>
+    <script>window.location.href='https://localhost/project/shopurneeds/admin-panel/banner-list';</script>  
+<?php } else {  
+    $_SESSION['message']="<div class='alert alert-success' role='alert'>Banner has been inserted</div>";
+?>
+    <script>window.location.href='https://localhost/project/shopurneeds/admin-panel/banner-list';</script>  
+<?php } ?>	

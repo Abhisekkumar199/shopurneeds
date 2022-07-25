@@ -1,0 +1,32 @@
+<?php  
+session_start();
+include("includes/configuration.php"); 
+include("includes/currency_display.php");
+	if($_REQUEST['name']=='cart')
+	{
+    	include("includes/header-cart.php");	
+		 include("pages/basketdetails.inc.php"); 
+	}
+	if($_REQUEST['name']=='checkout_one')
+	{	
+	    include("includes/header-cart.php");
+    	include("pages/login.inc.php"); 
+	}
+	if($_REQUEST['name']=='checkout_reg')
+	{
+	    include("includes/header-cart.php");
+        include("pages/registerdetail.inc.php"); 
+	}
+	if($_REQUEST['name']=='shipping')
+	{	
+	    include("includes/header-cart.php");
+	    include("pages/shippingdetail.inc.php"); 
+	}
+	
+	if($_REQUEST['name']=='editaddress')
+	{	
+	include("includes/header-cart.php");
+		 include("pages/editaddress.inc.php"); 
+	}
+	 
+?>

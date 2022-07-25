@@ -1,0 +1,107 @@
+RewriteEngine On
+Options -Indexes
+Options +FollowSymLinks
+
+
+#RewriteCond %{HTTP_HOST} ^littletags.com$
+#RewriteRule ^(.*) https://localhost/project/shopurneeds/$1  [QSA,L,R=301]
+
+RewriteEngine On
+RewriteCond %{HTTPS} !=on
+
+RewriteRule ^(.*)$ https://localhost/project/shopurneeds [L,R=301,NE] 
+
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}\.php -f
+
+
+
+
+
+
+
+RewriteRule ^(.*)$ $1.php
+RewriteRule ^product-detail/(.*)/(.*)/(.*) product-detail.php?pid=$1 [L]
+RewriteRule ^testimonial/(.*)/(.*) testimonial.php?testid=$1 [L]
+RewriteRule ^basket(.*)/(.*) basket.php?name=$2 [L]
+RewriteRule ^checkout(.*)/(.*) checkout.php?name=$2 [L]
+RewriteRule ^designers(.*)/(.*) designers.php?type=$2 [L]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-l
+
+RewriteRule ^(.*)$   search.php?catid=$1 [NC,L]
+
+<IfModule mod_expires.c>
+ExpiresActive On
+ExpiresByType text/html "access plus 14 days"
+ExpiresByType image/gif "access plus 60 days"
+ExpiresByType image/jpg "access plus 60 days"
+ExpiresByType image/png "access plus 60 days"
+#ExpiresByType application/x-javascript "access plus 60 days"
+#ExpiresByType text/css "access plus 60 days"
+ExpiresByType image/x-icon "access plus 360 days"
+</IfModule>
+
+
+<IfModule mod_deflate.c>
+    SetOutputFilter DEFLATE
+    <IfModule mod_setenvif.c>
+        # Netscape 4.x has some problems...
+        BrowserMatch ^Mozilla/4 gzip-only-text/html
+
+        # Netscape 4.06-4.08 have some more problems
+        BrowserMatch ^Mozilla/4\.0[678] no-gzip
+
+        # MSIE masquerades as Netscape, but it is fine
+        # BrowserMatch \bMSIE !no-gzip !gzip-only-text/html
+
+        # NOTE: Due to a bug in mod_setenvif up to Apache 2.0.48
+       # the above regex won't work. You can use the following
+        # workaround to get the desired effect:
+        BrowserMatch \bMSI[E] !no-gzip !gzip-only-text/html
+
+        # Don't compress images
+        SetEnvIfNoCase Request_URI .(?:gif|jpe?g|png)$ no-gzip dont-vary
+    </IfModule>
+
+    <IfModule mod_headers.c>
+        # Make sure proxies don't deliver the wrong content
+        Header append Vary User-Agent env=!dont-vary
+    </IfModule>
+</IfModule>
+
+DirectoryIndex index.php
+
+
+#ErrorDocument 404 "<H1>Page not found</H1>"
+
+#<FilesMatch \.php[0-9]$>
+#    SetHandler txt
+#</FilesMatch>
+
+#<FilesMatch "\.(js|css)>
+#FileETag None
+#Header unset ETag
+#Header set Cache-Control "max-age=0, no-cache, no-store, must-revalidate"
+#Header set Pragma "no-cache"
+#Header set Expires "Wed, 11 Aug 2018 09:00:00 GMT"
+#</FilesMatch>
+
+<FilesMatch "\.(ttf|otf|eot|woff|woff2)$">
+  <IfModule mod_headers.c>
+    Header set Access-Control-Allow-Origin "*"
+  </IfModule>
+</FilesMatch>
+
+<FilesMatch "\.(ico|pdf|flv|jpg|jpeg|png|gif|js|css|swf)$">
+Header set Cache-Control "max-age=604800, public"
+</FilesMatch>
+
+# php -- BEGIN cPanel-generated handler, do not edit
+# Set the “ea-php56” package as the default “PHP” programming language.
+<IfModule mime_module>
+  AddHandler application/x-httpd-ea-php56 .php .php5 .phtml
+</IfModule>
+# php -- END cPanel-generated handler, do not edit
